@@ -19,5 +19,9 @@
 **/sim/
 **/*.sim/
 
+# Vivado project file / hardware export
+*.xpr
+*.hw/
+
 #기타 제외
 *.zip
