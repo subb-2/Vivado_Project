@@ -46,7 +46,7 @@ module control_unit (
     end
 
     always_comb begin
-        n_state   = n_state;
+        n_state   = c_state;
         isrcsel   = 0;
         sumsrcsel = 0;
         iload     = 0;
