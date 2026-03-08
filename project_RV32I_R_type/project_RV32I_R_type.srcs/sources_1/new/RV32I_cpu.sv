@@ -10,6 +10,7 @@ module RV32I_cpu (
 
     logic rf_we;
     logic [31:0] rd1, rd2, alu_result;
+    logic [3:0] alu_control;
 
     control_unit U_CONTROL_UNIT (
         .clk(clk),
@@ -18,7 +19,7 @@ module RV32I_cpu (
         .funct3(instr_data[14:12]),
         .opcode(instr_data[6:0]),
         .rf_we(rf_we),
-        .alu_control()
+        .alu_control(alu_control)
     );
 
     register_file U_REG_FILE (
@@ -54,9 +55,22 @@ module register_file (
     output [31:0] RD2
 );
 
+    logic [31:0] wdata_arry [0:31];
+    assign RD1 = wdata_arry [RA1];
+    assign RD2 = wdata_arry [RA2]; 
+
     always_ff @( posedge clk, posedge rst ) begin
         if (rst) begin
-            
+            for(int i = 0, i< 32, i = i + 1)
+            begin 
+                 wdata_arry [i] <= 0;
+            end
+        end else begin 
+             if(rf_we) begin 
+                if(WA != 0) begin
+                   wdata_arry [WA] <= wdata;
+                end
+             end 
         end
     end
 
