@@ -6,7 +6,7 @@ module dedicated_cpu (
     output [7:0] out
 );
 
-    logic asrcsel, aload;
+    logic asrcsel, aload, outsel, alt10;
 
     control_unit U_CONTROL_UNIT (.*);
     datapath U_DATAPATH (.*);
@@ -15,14 +15,18 @@ endmodule
 module control_unit (
     input        clk,
     input        rst,
+    input        alt10,
     output logic aload,
-    output logic asrcsel
+    output logic asrcsel,
+    output logic outsel
 );
 
     typedef enum logic [2:0] {
         S0 = 0,
         S1 = 1,
-        S2 = 2
+        S2 = 2,
+        S3 = 3,
+        S4 = 4
     } state_t;
 
     state_t c_state, n_state;
@@ -39,22 +43,41 @@ module control_unit (
         n_state = c_state;
         asrcsel = 0;
         aload   = 0;
+        outsel  = 0;
         case (c_state)
             S0: begin
                 asrcsel = 0;
-                aload   = 0;
+                aload   = 1;
+                outsel  = 0;
                 n_state = S1;
             end
             S1: begin
                 asrcsel = 0;
-                aload   = 1;
-                n_state = S2;
+                aload   = 0;
+                outsel  = 0;
+                if (alt10) begin
+                    n_state = S2;
+                end else begin
+                    n_state = S4;
+                end
             end
             S2: begin
+                asrcsel = 0;
+                aload   = 0;
+                outsel  = 1;
+                n_state = S3;
+            end
+            S3: begin
                 asrcsel = 1;
                 aload   = 1;
+                outsel  = 0;
+                n_state = S1;
             end
-
+            S4: begin
+                asrcsel = 0;
+                aload   = 0;
+                outsel  = 1;
+            end
         endcase
     end
 
@@ -62,15 +85,17 @@ endmodule
 
 
 module datapath (
-    input        clk,
-    input        rst,
-    input        aload,
-    input        asrcsel,
-    output [7:0] out
+    input              clk,
+    input              rst,
+    input              aload,
+    input              asrcsel,
+    input              outsel,
+    output logic [7:0] out,
+    output             alt10
 );
 
     logic [7:0] w_aluout, w_reg_in, w_reg_out;
-    assign out = w_reg_out;
+    assign out = (outsel) ? w_reg_out : 8'hz;
 
     areg U_AREG (
         .clk(clk),
@@ -93,13 +118,18 @@ module datapath (
         .mux_out(w_reg_in)
     );
 
+    alt10_comp U_ALT10 (
+        .in_data(w_reg_out),
+        .alt10  (alt10)
+    );
+
 endmodule
 
 module areg (
-    input       clk,
-    input       rst,
-    input [7:0] reg_in,
-    input       aload,
+    input        clk,
+    input        rst,
+    input  [7:0] reg_in,
+    input        aload,
     output [7:0] reg_out
 );
 
@@ -135,5 +165,14 @@ module mux_2x1 (
 );
 
     assign mux_out = (asrcsel) ? b : a;
+
+endmodule
+
+module alt10_comp (
+    input  [7:0] in_data,
+    output       alt10
+);
+
+    assign alt10 = (in_data < 10);
 
 endmodule

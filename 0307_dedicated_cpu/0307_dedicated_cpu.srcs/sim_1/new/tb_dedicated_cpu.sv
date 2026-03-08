@@ -18,7 +18,7 @@ initial begin
     rst = 1;
     #20;
     rst = 0;
-    #100;
+    #400;
     $stop;
 end
 
