@@ -5,12 +5,15 @@ module RV32I_cpu (
     input         clk,
     input         rst,
     input  [31:0] instr_data,
-    input  [31:0] drdata,
+    input  [31:0] bus_rdata,
+    input         bus_Ready,
     output [31:0] instr_addr,
     output        dwe,
+    output        WREQ,
+    output        RREQ,
     output [ 2:0] o_funct3,
-    output [31:0] daddr,
-    output [31:0] dwdata 
+    output [31:0] bus_addr,
+    output [31:0] bus_wdata
 );
 
     logic pc_en, rf_we, alu_src, branch, jal, jalr;
@@ -97,7 +100,7 @@ module control_unit (
                 case (opcode)
                     `R_TYPE, `I_TYPE, `LUI_TYPE, `AUIPC_TYPE, `J_TYPE, `JL_TYPE: begin
                         n_state = WB;
-                    end 
+                    end
                     `B_TYPE: begin
                         n_state = FETCH;
                     end
@@ -223,16 +226,17 @@ module control_unit (
                         rfwd_src = 3'd3;
                     end
                     `J_TYPE, `JL_TYPE: begin
-                        rf_we    = 1'b1;
+                        rf_we = 1'b1;
                         rfwd_src = 3'd4;
                         jal      = 1'b1;                 // 타겟 주소가 PC+4로 덮어씌워지는 것 방지!
-                        if (opcode == `JL_TYPE) jalr = 1'b1; // JALR 타겟 유지
+                        if (opcode == `JL_TYPE)
+                            jalr = 1'b1;  // JALR 타겟 유지
                     end
                 endcase
             end
         endcase
     end
 
-    
+
 
 endmodule

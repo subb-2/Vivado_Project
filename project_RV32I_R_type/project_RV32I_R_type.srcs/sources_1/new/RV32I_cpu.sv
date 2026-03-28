@@ -61,7 +61,7 @@ module register_file (
 
     always_ff @( posedge clk, posedge rst ) begin
         if (rst) begin
-            for(int i = 0, i< 32, i = i + 1)
+            for(int i = 0; i < 32; i = i + 1)
             begin 
                  wdata_arry [i] <= 0;
             end
