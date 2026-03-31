@@ -6,11 +6,11 @@ module instruction_mem (
     output [31:0] instr_data
 );
 
-    //logic [31:0] rom [0:127];
-    logic [31:0] rom [0:32];
+    logic [31:0] rom [0:127];
+    //logic [31:0] rom [0:32];
 
     initial begin
-        //$readmemh("riscv_ru32i_rom_data.mem",rom); 
+        $readmemh("riscv_ru32i_rom_data.mem",rom); 
 
         //hex 값이니까 readmemh로 읽어야 함
         //저장할 위치도 알려줘야 함 : rom 
@@ -93,15 +93,15 @@ module instruction_mem (
         //rom[15] = 32'h00842d03;
 
         //I Type
-        rom[0] = 32'hffc18213;
-        rom[1] = 32'hffe62293;
-        rom[2] = 32'h0036b313;
-        rom[3] = 32'hfff74393;
-        rom[4] = 32'haaa76413;
-        rom[5] = 32'h1236f493;
-        rom[6] = 32'h00419513;
-        rom[7] = 32'h0046d593;
-        rom[8] = 32'h4046d613;
+        //rom[0] = 32'hffc18213;
+        //rom[1] = 32'hffe62293;
+        //rom[2] = 32'h0036b313;
+        //rom[3] = 32'hfff74393;
+        //rom[4] = 32'haaa76413;
+        //rom[5] = 32'h1236f493;
+        //rom[6] = 32'h00419513;
+        //rom[7] = 32'h0046d593;
+        //rom[8] = 32'h4046d613;
 
 
         //R-type HW
